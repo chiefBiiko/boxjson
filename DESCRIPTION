@@ -1,4 +1,4 @@
-Package: jsonbox
+Package: boxjson
 Title: Handles boxing of JSON atoms
 Version: 0.0.0.9000
 Authors@R: person("Noah", "Schwarz", email = "noah.anabiik.schwarz@gmail.com", role = c("aut", "cre"))

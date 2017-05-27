@@ -1,4 +1,4 @@
 library(testthat)
-library(jsonbox)
+library(boxjson)
 
-test_check("jsonbox")
+test_check("boxjson")

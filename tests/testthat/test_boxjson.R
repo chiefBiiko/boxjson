@@ -1,4 +1,4 @@
-# test jsonbox
+# test boxjson
 
 testthat::context('box box atoms')
 
