@@ -1,7 +1,5 @@
 # jsonbox
 
-source('https://github.com/chiefBiiko/octostep/raw/master/R/octostep.R')
-
 #' @internal
 isTruthyChr <- function(char) {
   if (is.character(char) && nchar(char) > 0L) {
@@ -11,21 +9,23 @@ isTruthyChr <- function(char) {
   }
 }
 
+#' @export
 hasUnboxedAtoms <- function(json) {
   stopifnot(isTruthyChr(json))
-  return(grepl('(?:"[[:alnum:]]"\\:)(?!\\[[^\\[]*\\])(?!\\{[^\\{]*\\})', 
+  return(grepl('(?:"[[:alnum:]]+"\\:)(?!\\[[^\\[]*\\])(?!\\{[^\\{]*\\})', 
                json, perl=TRUE))
 }
 
+#' @export
 boxAtoms <- function(json) {
   stopifnot(isTruthyChr(json))
   # split on some boundaries
   spl <- strsplit(json, 
-                  paste0('(?<="[[:alnum:]]"\\:)(?!\\[[^\\[]*\\])(?!\\{[^\\{]*\\})|', 
+                  paste0('(?<=[[:alnum:]]"\\:)(?!\\[[^\\[]*\\])(?!\\{[^\\{]*\\})|', 
                          '(?<=,)(?="[[:alnum:]]+"\\:)'), 
                   perl=TRUE)[[1]]
   # peep through
-  boxd <- octostep(as.list(spl), function(pre, cur, nxt) {
+  boxd <- octostep::octostep(as.list(spl), function(pre, cur, nxt) {
     if (!is.null(pre) &&
         grepl('"[[:alnum:]]+"\\:$', pre, perl=TRUE) &&
         !grepl('\\[[^\\[]*\\],?', cur, perl=TRUE)) {
@@ -41,6 +41,27 @@ boxAtoms <- function(json) {
   return(structure(glued, class='json'))
 }
 
-unboxAtoms <- function() {
-  
+#' @export
+unboxAtoms <- function(json) {
+  stopifnot(isTruthyChr(json))
+  # split on some boundaries
+  spl <- strsplit(json, 
+                  paste0('(?<=[[:alnum:]]"\\:)(?=\\[[^\\[,]*\\])|', 
+                         '(?<=,)(?="[[:alnum:]]+"\\:)'), 
+                  perl=TRUE)[[1]]
+  # peep through
+  unboxd <- octostep::octostep(as.list(spl), function(pre, cur, nxt) {
+    if (!is.null(pre) &&
+        grepl('"[[:alnum:]]+"\\:$', pre, perl=TRUE) &&
+        grepl('\\[[^\\[,]*\\],?', cur, perl=TRUE)) {
+      # unbox atomic data
+      gsub('[\\[\\]]', '', cur, perl=TRUE)
+    } else {
+      cur
+    }
+  })
+  # glue pieces to one
+  glued <- paste0(unlist(unboxd), collapse='')
+  # serve
+  return(structure(glued, class='json'))
 }
