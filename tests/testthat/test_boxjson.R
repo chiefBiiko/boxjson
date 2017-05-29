@@ -10,11 +10,18 @@ testthat::test_that('detects atoms appropriately', {
   noboxd <- jsonlite::toJSON(list(a="dumb string", 
                                   b=list(c=9999L, d=list(list(11L)))),
                              auto_unbox=TRUE)
+  pkgjson <- paste0("{\"name\":\"sheater\",\"version\":\"1.0.0\",", 
+                     "\"description\":\"\",\"main\":\"index.js\",",
+                     "\"scripts\":{\"test\":\"echo\\\"Error:notestspecified\\\"&&exit1\"},",
+                     "\"keywords\":[],\"author\":\"\",\"license\":\"ISC\",",
+                     "\"dependencies\":{\"express\":\"^4.15.3\"}}")
   
   # predicate function
   testthat::expect_identical(hasUnboxedAtoms(unboxd), TRUE)
   testthat::expect_identical(hasUnboxedAtoms(inboxd), FALSE)
   testthat::expect_identical(hasUnboxedAtoms(noboxd), TRUE)
+  testthat::expect_identical(hasUnboxedAtoms(pkgjson), TRUE)
+  testthat::expect_identical(hasUnboxedAtoms(boxAtoms(pkgjson)), FALSE)
   
   # boxing pt 1
   testthat::expect_identical(boxAtoms(noboxd), 
