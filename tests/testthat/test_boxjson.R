@@ -36,22 +36,27 @@ testthat::test_that('detects atoms appropriately', {
   
   # boxing pt 3
   testthat::expect_identical(boxAtoms('3,6'), structure('[3,6]', class='json'))
-  testthat::expect_identical(boxAtoms('"ac", "ab"'), structure('["ac","ab"]', 
-                                                               class='json'))
+  testthat::expect_identical(boxAtoms('"ac", "ab"'), 
+                             structure('["ac","ab"]', class='json'))
   # boxing pt 4
   testthat::expect_identical(boxAtoms('1'), structure('[1]', class='json'))
   testthat::expect_identical(boxAtoms('true'), structure('[true]', class='json'))
   testthat::expect_identical(boxAtoms('null'), structure('[null]', class='json'))
   
+  # boxing pt 5
+  testthat::expect_identical(boxAtoms('{"hello": [3]}'), 
+                             structure('{"hello":[3]}', class='json'))
+  
   # unboxing pt 1
   testthat::expect_identical(unboxAtoms(inboxd),
                              structure('{"a":1,"b":2,"c":[3,6]}', class='json'))
-  testthat::expect_identical(unboxAtoms('[2,3,4]'), structure('[2,3,4]', 
-                                                              class='json'))
+  testthat::expect_identical(unboxAtoms('[2,3,4]'), 
+                             structure('[2,3,4]', class='json'))
   
   # unboxing pt 2
-  testthat::expect_identical(unboxAtoms('[2]'), structure('2', class='json'))
-  testthat::expect_identical(unboxAtoms('[null]'), structure('null', 
-                                                             class='json'))
+  testthat::expect_identical(unboxAtoms('[2]'), 
+                             structure('2', class='json'))
+  testthat::expect_identical(unboxAtoms('[null]'), 
+                             structure('null', class='json'))
   
 })

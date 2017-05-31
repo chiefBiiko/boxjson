@@ -72,7 +72,8 @@ boxAtoms <- function(json) {
       # box atomic data
       sub('([^,\\}]*)(,)?', '[\\1]\\2', cur, perl=TRUE)
     } else if (is.null(pre) && is.null(nxt) && 
-               grepl('^(?:"*[[:print:]]+"*,*)+$', cur, perl=TRUE)) {
+               grepl('^(?:"*[[:print:]]+"*,*)+$', cur, perl=TRUE) &&
+               !grepl('^\\{.*\\}$', cur, perl=TRUE)) {
       paste0('[', cur, ']')
     } else {
       cur
