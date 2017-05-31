@@ -12,7 +12,7 @@ testthat::test_that('detects atoms appropriately', {
                              auto_unbox=TRUE)
   pkgjson <- paste0("{\"name\":\"sheater\",\"version\":\"1.0.0\",", 
                      "\"description\":\"\",\"main\":\"index.js\",",
-                     "\"scripts\":{\"test\":\"echo\\\"Error:notestspecified\\\"&&exit1\"},",
+                     "\"scripts\":{\"test\":\"echo\\\"Error:no test specified\\\"&&exit1\"},",
                      "\"keywords\":[],\"author\":\"\",\"license\":\"ISC\",",
                      "\"dependencies\":{\"express\":\"^4.15.3\"}}")
   
@@ -34,8 +34,24 @@ testthat::test_that('detects atoms appropriately', {
                              structure('{"ac":[11],"ab":[22],"c":[3,6]}', 
                                        class='json'))
   
-  # unboxing
+  # boxing pt 3
+  testthat::expect_identical(boxAtoms('3,6'), structure('[3,6]', class='json'))
+  testthat::expect_identical(boxAtoms('"ac", "ab"'), structure('["ac","ab"]', 
+                                                               class='json'))
+  # boxing pt 4
+  testthat::expect_identical(boxAtoms('1'), structure('[1]', class='json'))
+  testthat::expect_identical(boxAtoms('true'), structure('[true]', class='json'))
+  testthat::expect_identical(boxAtoms('null'), structure('[null]', class='json'))
+  
+  # unboxing pt 1
   testthat::expect_identical(unboxAtoms(inboxd),
                              structure('{"a":1,"b":2,"c":[3,6]}', class='json'))
+  testthat::expect_identical(unboxAtoms('[2,3,4]'), structure('[2,3,4]', 
+                                                              class='json'))
+  
+  # unboxing pt 2
+  testthat::expect_identical(unboxAtoms('[2]'), structure('2', class='json'))
+  testthat::expect_identical(unboxAtoms('[null]'), structure('null', 
+                                                             class='json'))
   
 })
