@@ -22,6 +22,8 @@ testthat::test_that('detects atoms appropriately', {
   testthat::expect_identical(hasUnboxedAtoms(noboxd), TRUE)
   testthat::expect_identical(hasUnboxedAtoms(pkgjson), TRUE)
   testthat::expect_identical(hasUnboxedAtoms(boxAtoms(pkgjson)), FALSE)
+  testthat::expect_identical(hasUnboxedAtoms('[[551],[66]]'), FALSE)
+  testthat::expect_identical(hasUnboxedAtoms('[[551],66]'), TRUE)
   
   # boxing pt 1
   testthat::expect_identical(boxAtoms(noboxd), 
@@ -56,6 +58,10 @@ testthat::test_that('detects atoms appropriately', {
   testthat::expect_identical(boxAtoms('[77,44],["doo"]'),
                              structure('[[77,44],["doo"]]', class='json'))
   
+  # boxing pt 7
+  testthat::expect_identical(boxAtoms('[[77,44],"doo"]'),
+                             structure('[[77,44],["doo"]]', class='json'))
+  
   # unboxing pt 1
   testthat::expect_identical(unboxAtoms(inboxd),
                              structure('{"a":1,"b":2,"c":[3,6]}', class='json'))
@@ -67,5 +73,13 @@ testthat::test_that('detects atoms appropriately', {
                              structure('2', class='json'))
   testthat::expect_identical(unboxAtoms('[null]'), 
                              structure('null', class='json'))
+  
+  # unboxing pt 3
+  testthat::expect_identical(unboxAtoms('[[55],[66]]'),
+                             structure('[55,66]', class='json'))
+  
+  # unboxing pt 4
+  testthat::expect_identical(unboxAtoms('[["hello,world"],[66]]'),
+                             structure('["hello,world",66]', class='json'))
   
 })
