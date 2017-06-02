@@ -21,7 +21,7 @@ testthat::test_that('detects atoms appropriately', {
   testthat::expect_identical(hasUnboxedAtoms(inboxd), FALSE)
   testthat::expect_identical(hasUnboxedAtoms(noboxd), TRUE)
   testthat::expect_identical(hasUnboxedAtoms(pkgjson), TRUE)
-#testthat::expect_identical(hasUnboxedAtoms(boxAtoms(pkgjson)), FALSE)
+  testthat::expect_identical(hasUnboxedAtoms(boxAtoms(pkgjson)), FALSE)
   testthat::expect_identical(hasUnboxedAtoms('[[551],[66]]'), FALSE)
   testthat::expect_identical(hasUnboxedAtoms('[[551],66]'), TRUE)
   
