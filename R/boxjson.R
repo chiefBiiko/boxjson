@@ -44,7 +44,11 @@ isObject <- function(json) {
 #' @internal
 stripArray <- function(json) {
   stopifnot(isTruthyChr(json))
-  return(gsub('^\\[|\\]$', '', json, perl=TRUE))
+  if (grepl('\\[.+\\]', json, perl=TRUE)) {
+    return(gsub('^\\[|\\]$', '', json, perl=TRUE))
+  } else {
+    return(json)  
+  }
 }
 
 #' Strips an object's outer brackets
@@ -87,21 +91,31 @@ mutateInputJSON <- function(json) {
 #' @return Logical.
 #'
 #' @internal
-hasUnclosedChar <- function(string, character) {
-  stopifnot(is.character(string),
-            is.character(character),
-            nchar(character) == 1L)
+hasUnclosedChar <- function(string, char) {
+  stopifnot(is.character(string), is.character(char), nchar(char) == 1L)
   # split to single characters
   chars <- strsplit(string, '')[[1]]
   # setup
-  opbr <- 0L
-  opqt <- 2L
+  opbr <- 0L        # if opbr is zero we r not in a struct
+  opqt <- 2L        # counts double quotes
+  nsqt <- list(2L)  # counts nested double quotes
   # peep through
-  for (char in chars) {
-    if (char %in% c('[', '{')) opbr <- opbr + 1L
-    if (char %in% c(']', '}')) opbr <- opbr - 1L
-    if (char == '"') opqt <- opqt + 1L
-    if (char == character && (opbr == 0L && opqt %% 2L == 0L)) return(TRUE)
+  for (i in seq(length(chars))) {
+    if (chars[i] %in% c('[', '{')) opbr <- opbr + 1L
+    if (chars[i] %in% c(']', '}')) opbr <- opbr - 1L
+    if (chars[i] == '"') opqt <- opqt + 1L
+    if (grepl('\\\\+', chars[i], perl=TRUE) && chars[i + 1L] == '"') {
+      if (!chars[i] %in% names(nsqt)) {
+        nsqt[[chars[i]]] <- 2L + 1L
+      } else if (chars[i] %in% names(nsqt)) {
+        nsqt[[chars[i]]] <- nsqt[[chars[i]]] + 1L
+      }
+    }
+    if (chars[i] == char && 
+        (opbr == 0L && opqt %% 2L == 0L  && 
+         all(unlist(nsqt) %% 2L == 0L))) {
+      return(TRUE)
+    }
   }
   return(FALSE)
 }
@@ -114,26 +128,32 @@ hasUnclosedChar <- function(string, character) {
 #' @return Chr vector.
 #'
 #' @internal
-splitOnUnclosedChar <- function(string, character, keep=FALSE) {
-  stopifnot(is.character(string),
-            is.character(character),
-            nchar(character) == 1L,
+splitOnUnclosedChar <- function(string, char, keep=FALSE) {
+  stopifnot(is.character(string), is.character(char), nchar(char) == 1L,
             is.logical(keep))
   # split to single characters
   chars <- strsplit(string, '', fixed=TRUE)[[1]]
   # setup
-  opbr <- 0L
-  opqt <- 2L
-  last.cut <- 0L
+  opbr <- 0L        # if opbr is zero we r not in a struct
+  opqt <- 2L        # counts double quotes
+  nsqt <- list(2L)  # counts nested double quotes
+  last.cut <- 0L    # tracks last slice index
   accu <- vector('character')
   # peep through
-  print(chars)
   for (i in seq(length(chars))) {
     if (chars[i] %in% c('[', '{')) opbr <- opbr + 1L
     if (chars[i] %in% c(']', '}')) opbr <- opbr - 1L
-    
-    if (chars[i] == '"') {print(opqt); opqt <- opqt + 1L}
-    if (chars[i] == character && (opbr == 0L && opqt %% 2L == 0L)) {
+    if (chars[i] == '"') opqt <- opqt + 1L
+    if (grepl('\\\\+', chars[i], perl=TRUE) && chars[i + 1L] == '"') {
+      if (!chars[i] %in% names(nsqt)) {
+        nsqt[[chars[i]]] <- 2L + 1L
+      } else if (chars[i] %in% names(nsqt)) {
+        nsqt[[chars[i]]] <- nsqt[[chars[i]]] + 1L
+      }
+    }
+    if (chars[i] == char && 
+        (opbr == 0L && opqt %% 2L == 0L  && 
+         all(unlist(nsqt) %% 2L == 0L))) {
       if (!keep) {
         accu <- append(accu, substr(string, last.cut + 1L, i - 1L))
       } else {  # keep split character
@@ -166,9 +186,12 @@ hasUnboxedAtoms <- function(json) {
   json <- mutateInputJSON(json)
   # extra check 4 arrays - is json an array of length > 1?
   if (isArray(json)) {                                  # case array
-    return(any(grepl('^[^\\[\\{].*[^\\]\\}]$', 
-                     splitOnUnclosedChar(stripArray(json), ','), 
-                     perl=TRUE)))
+    spl <- splitOnUnclosedChar(stripArray(json), ',')
+    if (length(spl) > 1L) {
+      return(any(grepl('^[^\\[\\{].*[^\\]\\}]$', spl, perl=TRUE)))
+    } else if (length(spl) == 1L) {
+      return(FALSE)
+    }
   } else if (isObject(json)) {                          # case object
     cpl <- splitOnUnclosedChar(stripObject(json), ',')  # split on unclosed comma
     spl <- vector('character')                          # helper accu
@@ -177,8 +200,12 @@ hasUnboxedAtoms <- function(json) {
     }
     # peep through spl
     hub <- octostep::octostep(as.list(spl), function(pre, cur, nxt) {
-      if (!is.null(pre) && cur == ':') {  # glimpse at object values
-        if (!isArray(nxt)) TRUE
+      if (!is.null(pre) && pre == ':' && !is.null(cur)) {  # glimpse at object values
+        if (isArray(cur) | isObject(cur)) {  # case struct - recursive
+          hasUnboxedAtoms(cur)
+        } else {                             # case atom object value
+          TRUE
+        }
       }
     })
     # reason
@@ -201,8 +228,15 @@ boxAtoms <- function(json) {
   
   if (isArray(json)) {          # case array
     spl <- splitOnUnclosedChar(stripArray(json), ',')
+    if (length(spl == 1L)) return(structure(json, class='json'))  # early exit
     bxd <- sapply(as.list(spl), function(s) {
-      if (!isArray(s)) paste0('[', s, ']') else s
+      if ((isArray(s) | isObject(s)) && hasUnboxedAtoms(s)) {
+        boxAtoms(s)
+      } else if (s != '[]') {
+        paste0('[', s, ']')
+      } else if (s == '[]') {
+        ''  # 2 avoid overboxing
+      }
     })
     glued <- paste0('[', paste0(bxd, collapse=','), ']')
     return(structure(glued, class='json'))
@@ -213,23 +247,22 @@ boxAtoms <- function(json) {
     for (cp in cpl) {           # split on unclosed colon
       spl <- append(spl, splitOnUnclosedChar(cp, ':', keep=TRUE))
     }
-  ##return(spl)
     # peep through spl
     bxd <- octostep::octostep(as.list(spl), function(pre, cur, nxt) {
-    ##cat(pre, ' ', cur, ' ', nxt)
-      if (!is.null(pre) && pre == ':' && !is.null(cur)) {  # glimpse at object values
-        if (!isArray(cur) && !isObject(cur)) {
+      if (!is.null(pre) && pre == ':' && !is.null(cur)) {  # cur object values
+        if ((isArray(cur) | isObject(cur)) && hasUnboxedAtoms(cur)) {
+          boxAtoms(cur)
+        } else if (!(isArray(cur) | isObject(cur))) {
           paste0('[', cur, ']')
-        } else if ((isArray(cur) | isObject(cur)) && hasUnboxedAtoms(cur)) {
-          print(cur)
-         #boxAtoms(cur)  # #ERRORS THRI TO SPLIT ONUNCLOSED CHAR
+        } else {  # case boxed struct
+          cur
         }
       } else {
         cur
       }
     })
     # glue things
-    glued <- paste0('[', paste0(bxd, collapse=','), ']')
+    glued <- paste0('{', paste0(bxd, collapse=''), '}')
     return(structure(glued, class='json'))
   } else {                      # case atom
     bxd <- paste0('[', json, ']')
