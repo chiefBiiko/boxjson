@@ -60,7 +60,11 @@ testthat::test_that('detects atoms appropriately', {
   
   # boxing pt 7
   testthat::expect_identical(boxAtoms('[[77,44],"doo"]'),
-                             structure('[[77,44],["doo"]]', class='json'))
+                             structure('[[77,44],"doo"]', class='json'))
+  
+  # boxing pt 8
+  testthat::expect_identical(boxAtoms('[4,1,9]'),
+                             structure('[4,1,9]', class='json'))
   
   # unboxing pt 1
   testthat::expect_identical(unboxAtoms(inboxd),
