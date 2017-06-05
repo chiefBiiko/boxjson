@@ -22,7 +22,7 @@ isTruthyChr <- function(x) {
 #' @internal
 isArray <- function(json) {
   stopifnot(isTruthyChr(json))
-  return(grepl('^\\[.*\\]$', json, perl=TRUE))
+  return(grepl('^\\[.+\\]$', json, perl=TRUE))
 }
 
 #' Is JSON an object?
@@ -33,7 +33,7 @@ isArray <- function(json) {
 #' @internal
 isObject <- function(json) {
   stopifnot(isTruthyChr(json))
-  return(grepl('^\\{.*\\}$', json, perl=TRUE))
+  return(grepl('^\\{.+\\}$', json, perl=TRUE))
 }
 
 #' Strips an array's outer brackets
@@ -44,7 +44,7 @@ isObject <- function(json) {
 #' @internal
 stripArray <- function(json) {
   stopifnot(isTruthyChr(json))
-  if (grepl('\\[.+\\]', json, perl=TRUE)) {
+  if (isArray(json)) {
     return(gsub('^\\[|\\]$', '', json, perl=TRUE))
   } else {
     return(json)  
@@ -59,7 +59,11 @@ stripArray <- function(json) {
 #' @internal
 stripObject <- function(json) {
   stopifnot(isTruthyChr(json))
-  return(gsub('^\\{|\\}$', '', json, perl=TRUE))
+  if (isObject(json)) {
+    return(gsub('^\\{|\\}$', '', json, perl=TRUE))
+  } else {
+    return(json)  
+  }
 }
 
 #' Mutates input JSON for safe processing
