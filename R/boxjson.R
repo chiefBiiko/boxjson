@@ -236,9 +236,7 @@ boxAtoms <- function(json) {
       bxd <- sapply(as.list(spl), function(s) {
         if (isObject(s) && hasUnboxedAtoms(s)) {
           boxAtoms(s)
-        } else if (isArray(s) && !hasUnclosedChar(stripArray(s), ',')) {
-          paste0('[', s, ']')
-        } else if (isArray(s) | !isArray(s)) {
+        } else {
           s
         }
       })
