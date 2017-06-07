@@ -17,13 +17,13 @@ testthat::test_that('detects atoms appropriately', {
                      "\"dependencies\":{\"express\":\"^4.15.3\"}}")
   
   # predicate function
-  testthat::expect_identical(hasUnboxedAtoms(unboxd), TRUE)
-  testthat::expect_identical(hasUnboxedAtoms(inboxd), FALSE)
-  testthat::expect_identical(hasUnboxedAtoms(noboxd), TRUE)
-  #testthat::expect_identical(hasUnboxedAtoms(pkgjson), TRUE)
-  #testthat::expect_identical(hasUnboxedAtoms(boxAtoms(pkgjson)), FALSE)
-  testthat::expect_identical(hasUnboxedAtoms('[[551],[66]]'), FALSE)
-  testthat::expect_identical(hasUnboxedAtoms('[[551],66]'), TRUE)
+  testthat::expect_identical(hasUnboxedAtom(unboxd), TRUE)
+  testthat::expect_identical(hasUnboxedAtom(inboxd), FALSE)
+  testthat::expect_identical(hasUnboxedAtom(noboxd), TRUE)
+  testthat::expect_identical(hasUnboxedAtom(pkgjson), TRUE)
+  testthat::expect_identical(hasUnboxedAtom(boxAtoms(pkgjson)), FALSE)
+  testthat::expect_identical(hasUnboxedAtom('[[551],[66]]'), FALSE)
+  testthat::expect_identical(hasUnboxedAtom('[[551],66]'), TRUE)
   
   # boxing pt 1
   testthat::expect_identical(boxAtoms(noboxd), 
