@@ -4,10 +4,12 @@
 \alias{hasUnboxedAtom}
 \title{Check if JSON contains unboxed atoms}
 \usage{
-hasUnboxedAtom(json)
+hasUnboxedAtom(json, strict = TRUE)
 }
 \arguments{
 \item{json}{JSON string or file reference.}
+
+\item{strict}{Throw an error if input is not valid JSON?}
 }
 \value{
 Logical.

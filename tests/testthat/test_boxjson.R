@@ -37,9 +37,9 @@ testthat::test_that('detects atoms appropriately', {
                                        class='json'))
   
   # boxing pt 3
-  testthat::expect_identical(boxAtoms('3,6'), 
+  testthat::expect_identical(boxAtoms('3,6', strict=FALSE), 
                              structure('[3,6]', class='json'))
-  testthat::expect_identical(boxAtoms('"ac", "ab"'), 
+  testthat::expect_identical(boxAtoms('"ac", "ab"', strict=FALSE), 
                              structure('["ac","ab"]', class='json'))
   # boxing pt 4
   testthat::expect_identical(boxAtoms('1'), structure('[1]', class='json'))
@@ -55,7 +55,7 @@ testthat::test_that('detects atoms appropriately', {
                              structure('{"hello":[3]}', class='json'))
   
   # boxing pt 6
-  testthat::expect_identical(boxAtoms('[77,44],["doo"]'),
+  testthat::expect_identical(boxAtoms('[77,44],["doo"]', strict=FALSE),
                              structure('[[77,44],["doo"]]', class='json'))
   
   # boxing pt 7

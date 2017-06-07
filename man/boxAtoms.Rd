@@ -4,10 +4,12 @@
 \alias{boxAtoms}
 \title{Box atoms in JSON}
 \usage{
-boxAtoms(json)
+boxAtoms(json, strict = TRUE)
 }
 \arguments{
 \item{json}{JSON string or file reference.}
+
+\item{strict}{Throw an error if input is not valid JSON?}
 }
 \value{
 JSON string.

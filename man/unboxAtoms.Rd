@@ -4,10 +4,12 @@
 \alias{unboxAtoms}
 \title{Unbox atoms in JSON}
 \usage{
-unboxAtoms(json)
+unboxAtoms(json, strict = TRUE)
 }
 \arguments{
 \item{json}{JSON string or file reference.}
+
+\item{strict}{Throw an error if input is not valid JSON?}
 }
 \value{
 JSON string.

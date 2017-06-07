@@ -3,13 +3,16 @@
 #' Check if JSON contains unboxed atoms
 #'
 #' @param json JSON string or file reference.
+#' @param strict Throw an error if input is not valid JSON?
 #' @return Logical.
 #'
 #' @export
-hasUnboxedAtom <- function(json) {
+hasUnboxedAtom <- function(json, strict=TRUE) {
   stopifnot(isTruthyChr(json))
   # mutate input for safe processing
   json <- mutateInputJSON(json)
+  # use strict
+  if (strict && !jsonlite::validate(json)) stop('invalid json')
   # extra check 4 arrays - is json an array of length > 1?
   if (isArray(json)) {                                  # case array
     spl <- splitOnUnclosedChar(stripArray(json), ',')
@@ -44,13 +47,16 @@ hasUnboxedAtom <- function(json) {
 #' Box atoms in JSON
 #'
 #' @param json JSON string or file reference.
+#' @param strict Throw an error if input is not valid JSON?
 #' @return JSON string.
 #'
 #' @export
-boxAtoms <- function(json) {
+boxAtoms <- function(json, strict=TRUE) {
   stopifnot(isTruthyChr(json))
   # mutate input for safe processing
   json <- mutateInputJSON(json)
+  # use strict
+  if (strict && !jsonlite::validate(json)) stop('invalid json')
   # boxing
   if (isArray(json)) {                                       # case array
     if (hasUnclosedChar(json, ',')) {                        # case pseudo array
@@ -102,13 +108,16 @@ boxAtoms <- function(json) {
 #' Unbox atoms in JSON
 #'
 #' @param json JSON string or file reference.
+#' @param strict Throw an error if input is not valid JSON?
 #' @return JSON string.
 #'
 #' @export
-unboxAtoms <- function(json) {
+unboxAtoms <- function(json, strict=TRUE) {
   stopifnot(isTruthyChr(json))
   # mutate input for safe processing
   json <- mutateInputJSON(json)
+  # use strict
+  if (strict && !jsonlite::validate(json)) stop('invalid json')
   # check if input json is an array of length 1 else ...
   if (isArray(json)  && !hasUnclosedChar(stripArray(json), ',')) {
     return(structure(stripArray(json), class='json'))  # early exit
