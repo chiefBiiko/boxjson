@@ -9,9 +9,9 @@ Utility to transform JSON from **unboxed** to **boxed** state and vice versa.
 An *atom* is a string, number, boolean or null object that is not an item 
 of an array.
 
-A JSON string that *contains any atoms* is **unboxed**.
+JSON that *contains any atoms* is **unboxed**.
 
-A JSON string that *does not contain any atoms* is **boxed**.
+JSON that *does not contain any atoms* is **boxed**.
 
 ## Get it
 
