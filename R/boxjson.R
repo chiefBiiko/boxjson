@@ -23,10 +23,8 @@ hasUnboxedAtom <- function(json, strict=TRUE) {
     }
   } else if (isObject(json)) {                          # case object
     cpl <- splitOnUnclosedChar(stripObject(json), ',')  # split on unclosed comma
-    spl <- vector('character')                          # helper accu
-    for (cp in cpl) {                                   # split on unclosed colon
-      spl <- append(spl, splitOnUnclosedChar(cp, ':', keep=TRUE))
-    }
+    # split on unclosed colon
+    spl <- unlist(lapply(cpl, splitOnUnclosedChar, char=':', keep=TRUE))
     # peep through spl
     hub <- octostep::octostep(as.list(spl), function(pre, cur, nxt) {
       if (!is.null(pre) && pre == ':' && !is.null(cur)) {  # glimpse at object values
@@ -66,7 +64,7 @@ boxAtoms <- function(json, strict=TRUE) {
     } else {                                                 # case real array
       spl <- splitOnUnclosedChar(stripArray(json), ',')
       bxd <- sapply(as.list(spl), function(s) {
-        if (isObject(s) && hasUnboxedAtom(s)) {
+        if (isObject(s) || isArray(s) && hasUnboxedAtom(s)) {
           boxAtoms(s)
         } else {
           s
@@ -78,16 +76,14 @@ boxAtoms <- function(json, strict=TRUE) {
   } else if (isObject(json)) {  # case object
     # split on unclosed comma
     cpl <- splitOnUnclosedChar(stripObject(json), ',', keep=TRUE)
-    spl <- vector('character')  # helper accu
-    for (cp in cpl) {           # split on unclosed colon
-      spl <- append(spl, splitOnUnclosedChar(cp, ':', keep=TRUE))
-    }
+    # split on unclosed colon
+    spl <- unlist(lapply(cpl, splitOnUnclosedChar, char=':', keep=TRUE))
     # peep through spl
     bxd <- octostep::octostep(as.list(spl), function(pre, cur, nxt) {
       if (!is.null(pre) && pre == ':' && !is.null(cur)) {  # cur object values
-        if ((isArray(cur) | isObject(cur)) && hasUnboxedAtom(cur)) {
+        if (isArray(cur) || isObject(cur) && hasUnboxedAtom(cur)) {
           boxAtoms(cur)
-        } else if (!(isArray(cur) | isObject(cur))) {
+        } else if (!(isArray(cur) || isObject(cur))) {
           paste0('[', cur, ']')
         } else {  # case boxed struct
           cur
@@ -135,19 +131,17 @@ unboxAtoms <- function(json, strict=TRUE) {
   } else if (isObject(json)) {
     # split on unclosed comma
     cpl <- splitOnUnclosedChar(stripObject(json), ',', keep=TRUE)
-    spl <- vector('character')  # helper accu
-    for (cp in cpl) {           # split on unclosed colon
-      spl <- append(spl, splitOnUnclosedChar(cp, ':', keep=TRUE))
-    }
+    # split on unclosed colon
+    spl <- unlist(lapply(cpl, splitOnUnclosedChar, char=':', keep=TRUE))
     # peep through
     unbxd <- octostep::octostep(as.list(spl), function(pre, cur, nxt) {
       if (!is.null(pre) && pre == ':' && !is.null(cur)) {  # cur object values
-        if ((isArray(cur) | isObject(cur))) {
+        if (isArray(cur) || isObject(cur)) {
           unboxAtoms(cur)                              # case boxed struct
-        } else if (!(isArray(cur) | isObject(cur))) {
+        } else if (!(isArray(cur) || isObject(cur))) {
           cur                                          # case already unboxed
           #paste0('[', cur, ']')
-        } else if (isArray(cur) | isObject(cur)) {
+        } else if (isArray(cur) || isObject(cur)) {
           cur                                          # case unboxed struct
         }
       } else {
