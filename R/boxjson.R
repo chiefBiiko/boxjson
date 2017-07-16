@@ -26,20 +26,17 @@ hasUnboxedAtom <- function(json, strict=TRUE) {
     # split on unclosed colon
     spl <- unlist(lapply(cpl, splitOnUnclosedChar, char=':', keep=TRUE))
     # peep through spl
-    unb <- vector('logical')
-    for (i in seq_along(spl)) {
-      pre <- spl[i - 1L]
-      cur <- spl[i]
-      if (!is.na(pre) && identical(pre, ':') && !is.na(cur)) {  # obj vals
-        if (isArray(cur) || isObject(cur)) {  # case struct - recursive
-          unb <- append(unb, hasUnboxedAtom(cur))
-        } else {                              # case atom object value
-          unb <- append(unb, TRUE)
+    pre <- NA
+    for (chunk in spl) {
+      if (identical(pre, ':')) {  # obj vals
+        if (isArray(chunk) || isObject(chunk)) {  # case struct - recursive
+          return(hasUnboxedAtom(chunk))
+        } else {                                  # case atom object value
+          return(TRUE)
         }
       }
+      pre <- chunk
     }
-    # reason
-    return(any(unb))
   } else {                                              # case atom
     return(TRUE)
   }
