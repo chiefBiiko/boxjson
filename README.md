@@ -27,6 +27,15 @@ devtools::install_github('chiefBiiko/boxjson')
 
 ***
 
+## Usage
+
+```r
+boxjson::boxAtoms('{"name":"chiefBiiko","mode":"fraud"}')
+# {"name":["chiefBiiko"],"mode":["fraud"]}
+```
+
+***
+
 ## License
 
 MIT
