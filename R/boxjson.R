@@ -26,17 +26,20 @@ hasUnboxedAtom <- function(json, strict=TRUE) {
     # split on unclosed colon
     spl <- unlist(lapply(cpl, splitOnUnclosedChar, char=':', keep=TRUE))
     # peep through spl
-    hub <- octostep::octostep(as.list(spl), function(pre, cur, nxt) {
-      if (!is.null(pre) && pre == ':' && !is.null(cur)) {  # glimpse at object values
-        if (isArray(cur) | isObject(cur)) {  # case struct - recursive
-          hasUnboxedAtom(cur)
-        } else {                             # case atom object value
-          TRUE
+    unb <- vector('logical')
+    for (i in seq_along(spl)) {
+      pre <- spl[i - 1L]
+      cur <- spl[i]
+      if (!is.na(pre) && identical(pre, ':') && !is.na(cur)) {  # obj vals
+        if (isArray(cur) || isObject(cur)) {  # case struct - recursive
+          unb <- append(unb, hasUnboxedAtom(cur))
+        } else {                              # case atom object value
+          unb <- append(unb, TRUE)
         }
       }
-    })
+    }
     # reason
-    return(any(unlist(hub)))
+    return(any(unb))
   } else {                                              # case atom
     return(TRUE)
   }
@@ -117,15 +120,15 @@ unboxAtoms <- function(json, strict=TRUE) {
   # check if input json is an array of length 1 else ...
   if (isArray(json)  && !hasUnclosedChar(stripArray(json), ',')) {
     return(structure(stripArray(json), class='json'))  # early exit
-  } else if (isArray(json) && 
+  } else if (isArray(json) &&
              any(grepl('^[\\[\\{].*[\\]\\}]$',  # ... has any boxed atoms?
-                       splitOnUnclosedChar(stripArray(json), ','), 
+                       splitOnUnclosedChar(stripArray(json), ','),
                        perl=TRUE))) {
     # then unbox boxed atoms in array
     spl <- splitOnUnclosedChar(stripArray(json), ',', keep=TRUE)
-    unboxd <- paste0('[', 
-                     paste0(gsub('^\\[(.*)\\]$', '\\1', spl, perl=TRUE), 
-                            collapse=''), 
+    unboxd <- paste0('[',
+                     paste0(gsub('^\\[(.*)\\]$', '\\1', spl, perl=TRUE),
+                            collapse=''),
                      ']')
     return(structure(unboxd, class='json'))            # early exit
   } else if (isObject(json)) {
@@ -151,7 +154,7 @@ unboxAtoms <- function(json, strict=TRUE) {
     # reglue object components
     glued <- paste0('{', paste0(unbxd, collapse=''), '}')
     # serve
-    return(structure(glued, class='json')) 
+    return(structure(glued, class='json'))
   } else if (!(isObject(json) && isArray(json))) {
     return(structure(json, class='json'))
   }

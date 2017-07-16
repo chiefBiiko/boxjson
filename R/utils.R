@@ -47,7 +47,7 @@ stripArray <- function(json) {
   if (isArray(json)) {
     return(gsub('^\\[|\\]$', '', json, perl=TRUE))
   } else {
-    return(json)  
+    return(json)
   }
 }
 
@@ -62,22 +62,22 @@ stripObject <- function(json) {
   if (isObject(json)) {
     return(gsub('^\\{|\\}$', '', json, perl=TRUE))
   } else {
-    return(json)  
+    return(json)
   }
 }
 
 #' Mutates input JSON for safe processing
-#' 
+#'
 #' @param json Input JSON.
 #' @return JSON string.
-#' 
+#'
 #' @keywords internal
 mutateInputJSON <- function(json) {
   stopifnot(isTruthyChr(json))
   # allow file references
   if (file.exists(json)) {
-    json <- gsub('\\s+(?=(?:(?:[^"]*"){2})*[^"]*$)', '', 
-                 paste0(readLines(json, warn=FALSE), collapse=''), 
+    json <- gsub('\\s+(?=(?:(?:[^"]*"){2})*[^"]*$)', '',
+                 paste0(readLines(json, warn=FALSE), collapse=''),
                  perl=TRUE)
   } else if (grepl('\\s(?=(?:(?:[^"]*"){2})*[^"]*$)', json, perl=TRUE)) {
     json <- gsub('\\s+(?=(?:(?:[^"]*"){2})*[^"]*$)', '', json, perl=TRUE)
@@ -87,7 +87,7 @@ mutateInputJSON <- function(json) {
   return(json)  # serve
 }
 
-#' Does a string contain a character neither enclosed in brackets nor 
+#' Does a string contain a character neither enclosed in brackets nor
 #' double quotes?
 #'
 #' @param string Character vector of length 1L.
@@ -104,7 +104,7 @@ hasUnclosedChar <- function(string, char) {
   opqt <- 2L        # counts double quotes
   nsqt <- list(2L)  # counts nested double quotes
   # peep through
-  for (i in seq(length(chars))) {
+  for (i in seq_along(chars)) {
     if (chars[i] %in% c('[', '{')) opbr <- opbr + 1L
     if (chars[i] %in% c(']', '}')) opbr <- opbr - 1L
     if (chars[i] == '"') opqt <- opqt + 1L
@@ -115,8 +115,8 @@ hasUnclosedChar <- function(string, char) {
         nsqt[[chars[i]]] <- nsqt[[chars[i]]] + 1L
       }
     }
-    if (chars[i] == char && 
-        (opbr == 0L && opqt %% 2L == 0L  && 
+    if (chars[i] == char &&
+        (opbr == 0L && opqt %% 2L == 0L  &&
          all(unlist(nsqt) %% 2L == 0L))) {
       return(TRUE)
     }
@@ -124,7 +124,7 @@ hasUnclosedChar <- function(string, char) {
   return(FALSE)
 }
 
-#' Splits a string on given character neither enclosed in brackets nor 
+#' Splits a string on given character neither enclosed in brackets nor
 #' double quotes
 #'
 #' @param string Character vector of length 1L.
@@ -144,7 +144,7 @@ splitOnUnclosedChar <- function(string, char, keep=FALSE) {
   last.cut <- 0L    # tracks last slice index
   accu <- vector('character')
   # peep through
-  for (i in seq(length(chars))) {
+  for (i in seq_along(chars)) {
     if (chars[i] %in% c('[', '{')) opbr <- opbr + 1L
     if (chars[i] %in% c(']', '}')) opbr <- opbr - 1L
     if (chars[i] == '"') opqt <- opqt + 1L
@@ -155,8 +155,8 @@ splitOnUnclosedChar <- function(string, char, keep=FALSE) {
         nsqt[[chars[i]]] <- nsqt[[chars[i]]] + 1L
       }
     }
-    if (chars[i] == char && 
-        (opbr == 0L && opqt %% 2L == 0L  && 
+    if (chars[i] == char &&
+        (opbr == 0L && opqt %% 2L == 0L  &&
          all(unlist(nsqt) %% 2L == 0L))) {
       if (!keep) {
         accu <- append(accu, substr(string, last.cut + 1L, i - 1L))
