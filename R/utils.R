@@ -36,6 +36,17 @@ isObject <- function(json) {
   return(grepl('^\\{.+\\}$', json, perl=TRUE))
 }
 
+#' Is JSON an array or object?
+#'
+#' @param json JSON string.
+#' @return Logical.
+#'
+#' @keywords internal
+isStruct <- function(json) {
+  stopifnot(isTruthyChr(json))
+  return(isArray(json) || isObject(json))
+}
+
 #' Strips an array's outer brackets
 #'
 #' @param json JSON array.
@@ -98,7 +109,7 @@ mutateInputJSON <- function(json) {
 hasUnclosedChar <- function(string, char) {
   stopifnot(is.character(string), is.character(char), nchar(char) == 1L)
   # split to single characters
-  chars <- strsplit(string, '')[[1]]
+  chars <- strsplit(string, '')[[1L]]
   # setup
   opbr <- 0L        # if opbr is zero we r not in a struct
   opqt <- 2L        # counts double quotes

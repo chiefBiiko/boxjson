@@ -1,8 +1,12 @@
 # boxjson
 
-[![Build Status](https://travis-ci.org/chiefBiiko/boxjson.svg?branch=master)](https://travis-ci.org/chiefBiiko/boxjson) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/chiefBiiko/boxjson?branch=master&svg=true)](https://ci.appveyor.com/project/chiefBiiko/boxjson)
+[![Build Status](https://travis-ci.org/chiefBiiko/boxjson.svg?branch=master)](https://travis-ci.org/chiefBiiko/boxjson) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/chiefBiiko/boxjson?branch=master&svg=true)](https://ci.appveyor.com/project/chiefBiiko/boxjson) [![Coverage Status](https://img.shields.io/codecov/c/github/chiefBiiko/boxjson/master.svg)](https://codecov.io/github/chiefBiiko/boxjson?branch=master)
+
+***
 
 Utility to transform JSON from **unboxed** to **boxed** state and vice versa.
+
+***
 
 ## Approach
 
@@ -13,8 +17,16 @@ JSON that *contains any atoms* is **unboxed**.
 
 JSON that *does not contain any atoms* is **boxed**.
 
+***
+
 ## Get it
 
 ``` r
 devtools::install_github('chiefBiiko/boxjson')
 ```
+
+***
+
+## License
+
+MIT
