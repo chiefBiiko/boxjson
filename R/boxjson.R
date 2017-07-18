@@ -52,7 +52,7 @@ boxAtoms <- function(json, strict=TRUE) {
   # use strict
   if (strict && !jsonlite::validate(json)) stop('invalid json')
   # boxing
-  if (isArray(json)) {
+  if (isArray(json) && !hasUnclosedChar(json, char=',')) {
     if (hasUnclosedChar(json, ',')) {                        # case pseudo array
       return(structure(paste0('[', json, ']'), class='json'))
     } else if (!hasUnclosedChar(stripArray(json), ',')) {    # case atom array
@@ -65,7 +65,7 @@ boxAtoms <- function(json, strict=TRUE) {
       glued <- paste0('[', paste0(bxd, collapse=','), ']')
       return(structure(glued, class='json'))
     }
-  } else if (isObject(json)) {
+  } else if (isObject(json) && !hasUnclosedChar(json, char=',')) {
     # split on unclosed comma
     cpl <- splitOnUnclosedChar(stripObject(json), ',', keep=TRUE)
     # split on unclosed colon
