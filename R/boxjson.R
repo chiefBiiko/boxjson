@@ -12,7 +12,7 @@ hasUnboxedAtom <- function(json, strict=TRUE) {
   # mutate input for safe processing
   json <- mutateInputJSON(json)
   # use strict
-  if (strict && !jsonlite::validate(json)) stop('invalid json')
+##if (strict && !jsonlite::validate(json)) stop('invalid json')
   # checking
   if (isArray(json)) {
     spl <- splitOnUnclosedChar(stripArray(json), ',')
@@ -50,7 +50,7 @@ boxAtoms <- function(json, strict=TRUE) {
   # mutate input for safe processing
   json <- mutateInputJSON(json)
   # use strict
-  if (strict && !jsonlite::validate(json)) stop('invalid json')
+##if (strict && !jsonlite::validate(json)) stop('invalid json')
   # boxing
   if (isArray(json) && !hasUnclosedChar(json, char=',')) {
     if (hasUnclosedChar(json, ',')) {                        # case pseudo array
@@ -107,7 +107,7 @@ unboxAtoms <- function(json, strict=TRUE) {
   # mutate input for safe processing
   json <- mutateInputJSON(json)
   # use strict
-  if (strict && !jsonlite::validate(json)) stop('invalid json')
+##if (strict && !jsonlite::validate(json)) stop('invalid json')
   # check if input json is an array of length 1 else ...
   if (isArray(json)  && !hasUnclosedChar(stripArray(json), ',')) {
     return(structure(stripArray(json), class='json'))
