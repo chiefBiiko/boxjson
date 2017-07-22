@@ -7,7 +7,7 @@
 #'
 #' @keywords internal
 isTruthyChr <- function(x) {
-  if (is.character(x) && nchar(x) > 0L) {
+  if (is.character(x) && length(x) == 1L && nchar(x) > 0L) {
     return(TRUE)
   } else {
     return(FALSE)
@@ -147,7 +147,7 @@ splitOnUnclosedChar <- function(string, char, keep=FALSE) {
   stopifnot(is.character(string), is.character(char), nchar(char) == 1L,
             is.logical(keep))
   # split to single characters
-  chars <- strsplit(string, '', fixed=TRUE)[[1]]
+  chars <- strsplit(string, '', fixed=TRUE)[[1L]]
   # setup
   opbr <- 0L        # if opbr is zero we r not in a struct
   opqt <- 2L        # counts double quotes
