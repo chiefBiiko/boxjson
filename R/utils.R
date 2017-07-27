@@ -20,10 +20,7 @@ isTruthyChr <- function(x) {
 #' @return Logical.
 #'
 #' @keywords internal
-isArray <- function(json) {
-  stopifnot(isTruthyChr(json))
-  return(grepl('^\\[.+\\]$', json, perl=TRUE))
-}
+isArray <- function(json) grepl('^\\[.+\\]$', json, perl=TRUE)
 
 #' Is JSON an object?
 #'
@@ -31,10 +28,7 @@ isArray <- function(json) {
 #' @return Logical.
 #'
 #' @keywords internal
-isObject <- function(json) {
-  stopifnot(isTruthyChr(json))
-  return(grepl('^\\{.+\\}$', json, perl=TRUE))
-}
+isObject <- function(json) grepl('^\\{.+\\}$', json, perl=TRUE)
 
 #' Is JSON an array or object?
 #'
@@ -42,10 +36,7 @@ isObject <- function(json) {
 #' @return Logical.
 #'
 #' @keywords internal
-isStruct <- function(json) {
-  stopifnot(isTruthyChr(json))
-  return(isArray(json) || isObject(json))
-}
+isStruct <- function(json) isArray(json) || isObject(json)
 
 #' Strips an array's outer brackets
 #'
@@ -54,8 +45,7 @@ isStruct <- function(json) {
 #'
 #' @keywords internal
 stripArray <- function(json) {
-  stopifnot(isTruthyChr(json))
-  if (isArray(json)) {
+  if (isArray(json)) { 
     return(gsub('^\\[|\\]$', '', json, perl=TRUE))
   } else {
     return(json)
@@ -69,7 +59,6 @@ stripArray <- function(json) {
 #'
 #' @keywords internal
 stripObject <- function(json) {
-  stopifnot(isTruthyChr(json))
   if (isObject(json)) {
     return(gsub('^\\{|\\}$', '', json, perl=TRUE))
   } else {
