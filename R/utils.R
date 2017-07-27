@@ -14,7 +14,7 @@ isTruthyChr <- function(x) {
   }
 }
 
-#' Is JSON an array?
+#' Is JSON a (non-empty) array(-like)?
 #'
 #' @param json JSON string.
 #' @return Logical.
@@ -22,7 +22,7 @@ isTruthyChr <- function(x) {
 #' @keywords internal
 isArray <- function(json) grepl('^\\[.+\\]$', json, perl=TRUE)
 
-#' Is JSON an object?
+#' Is JSON a (non-empty) object(-like)?
 #'
 #' @param json JSON string.
 #' @return Logical.
@@ -30,7 +30,7 @@ isArray <- function(json) grepl('^\\[.+\\]$', json, perl=TRUE)
 #' @keywords internal
 isObject <- function(json) grepl('^\\{.+\\}$', json, perl=TRUE)
 
-#' Is JSON an array or object?
+#' Is JSON a (non-empty) array(-like) or object(-like)?
 #'
 #' @param json JSON string.
 #' @return Logical.
@@ -82,8 +82,6 @@ mutateInputJSON <- function(json) {
   } else if (grepl('\\s(?=(?:(?:[^"]*"){2})*[^"]*$)', json, perl=TRUE)) {
     json <- gsub('\\s+(?=(?:(?:[^"]*"){2})*[^"]*$)', '', json, perl=TRUE)
   }
-  # quoting
-  json <- gsub('\'', '"', json, fixed=TRUE)
   return(json)  # serve
 }
 
