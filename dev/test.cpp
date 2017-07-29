@@ -12,7 +12,7 @@ int main(const int argc, const char* argv[]) {
   const char delimiter = ',';
   
   //std::cout << hasUnclosedChar(input, delimiter) << std::endl;
-  std::vector<std::string> pieces(splitOnUnclosedChar(input, delimiter));
+  std::vector<std::string> pieces{splitOnUnclosedChar(input, delimiter)};
 //std::cout << pieces[0] << '\n' << pieces[1] << std::endl;
   std::for_each(pieces.begin(), pieces.end(), [](const std::string& s) {
     std::cout << s << std::endl;
