@@ -15,12 +15,13 @@ hasUnboxedAtom <- function(json, strict=TRUE) {
   if (strict && !jsonlite::validate(json)) stop('invalid json')
   # checking
   if (isArray(json)) {
-    spl <- splitOnUnclosedChar(stripArray(json), ',')
-    if (length(spl) > 1L) {
-      return(any(grepl('^[^\\[\\{].*[^\\]\\}]$', spl, perl=TRUE)))
-    } else if (length(spl) == 1L) {
-      return(FALSE)
-    }
+    return(FALSE)
+    # spl <- splitOnUnclosedChar(stripArray(json), ',')
+    # if (length(spl) > 1L) {
+    #   return(any(grepl('^[^\\[\\{].*[^\\]\\}]$', spl, perl=TRUE)))
+    # } else if (length(spl) == 1L) {
+    #   return(FALSE)
+    # }
   } else if (isObject(json)) {
     cpl <- splitOnUnclosedChar(stripObject(json), ',')  # split on unclosed comma
     # split on unclosed colon
@@ -28,11 +29,12 @@ hasUnboxedAtom <- function(json, strict=TRUE) {
     # peep through spl
     pre <- NA
     for (chunk in spl) {
-      if (identical(pre, ':')) {  # obj vals
-        if (isStruct(chunk)) return(hasUnboxedAtom(chunk)) else return(TRUE)
+      if (identical(pre, ':') && (!isStruct(chunk) || hasUnboxedAtom(chunk))) {
+        return(TRUE)
       }
       pre <- chunk
     }
+    return(FALSE)
   } else {
     return(TRUE)
   }

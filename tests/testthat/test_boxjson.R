@@ -23,7 +23,8 @@ testthat::test_that('predicate function', {
   testthat::expect_identical(hasUnboxedAtom(pkgjson), TRUE)
   testthat::expect_identical(hasUnboxedAtom(boxAtoms(pkgjson)), FALSE)
   testthat::expect_identical(hasUnboxedAtom('[[551],[66]]'), FALSE)
-  testthat::expect_identical(hasUnboxedAtom('[[551],66]'), TRUE)
+  testthat::expect_identical(hasUnboxedAtom('[[551],66]'), FALSE)
+  testthat::expect_identical(hasUnboxedAtom('[419]'), FALSE)
 
 })
 
