@@ -45,7 +45,7 @@ isStruct <- function(json) isArray(json) || isObject(json)
 #'
 #' @keywords internal
 stripArray <- function(json) {
-  if (isArray(json)) { 
+  if (isArray(json)) {
     return(gsub('^\\[|\\]$', '', json, perl=TRUE))
   } else {
     return(json)
@@ -86,7 +86,7 @@ mutateInputJSON <- function(json) {
 }
 
 #' Does what its name says
-#' 
+#'
 #' @param string character. Input string to \code{hasUnclosedChar}.
 #' @param index numeric. aka 'start searching after the character at index'.
 #' @return logical. See name.
@@ -97,7 +97,7 @@ charIndexIsFollowedByUnevenNumberOfOuterDoubleQuotes <- function(string, index) 
   trail <- strsplit(string, '')[[1L]]
   countr <- 0L
   for (i in (index + 1L):length(trail)) {
-    if (identical(trail[i], '"') && 
+    if (identical(trail[i], '"') &&
         !grepl('^\\\\+$', trail[i - 1L], perl=TRUE)) {
       countr <- countr + 1L
     }
@@ -109,7 +109,7 @@ charIndexIsFollowedByUnevenNumberOfOuterDoubleQuotes <- function(string, index) 
 #' double quotes?
 #'
 #' @param string Character vector of length 1.
-#' @param character Single character to search for. Cannot be any of 
+#' @param character Single character to search for. Cannot be any of
 #' \code{[]{}"}.
 #' @return Logical.
 #'
@@ -122,7 +122,7 @@ hasUnclosedChar <- function(string, char) {
   opbr <- 0L     # if opbr is zero we r not in a struct
 ##opqt <- FALSE  # if FALSE we r not in a string
   qtct <- 0L     # if even we r not in a string
-  # peep through
+  # peep through --- THIS VERSION IS COOL
   for (i in seq_along(chars)) {
     if (chars[i] %in% c('[', '{')) opbr <- opbr + 1L
     if (chars[i] %in% c(']', '}')) opbr <- opbr - 1L
@@ -146,7 +146,7 @@ hasUnclosedChar <- function(string, char) {
 #' double quotes
 #'
 #' @param string Character vector of length 1L.
-#' @param character Single character to split on. Cannot be any of 
+#' @param character Single character to split on. Cannot be any of
 #' \code{[]{}"}.
 #' @return character. Vector of splits.
 #'
@@ -162,7 +162,7 @@ splitOnUnclosedChar <- function(string, char, keep=FALSE) {
 ##qtct <- 0L      # if even we r not in a string
   last.cut <- 0L  # tracks last slice index
   accu <- vector('character')
-  # peep through
+  # peep through --- NEED 2 MAKE THIS ONE WORK LIKE THE OTHER !!!
   for (i in seq_along(chars)) {
     if (chars[i] %in% c('[', '{')) opbr <- opbr + 1L
     if (chars[i] %in% c(']', '}')) opbr <- opbr - 1L
