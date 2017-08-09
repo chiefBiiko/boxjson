@@ -12,24 +12,24 @@ boxAtoms <- function(json, strict=TRUE) {
   # use strict
   if (strict && !jsonlite::validate(json)) stop('invalid json')
   # boxing
-  if (isArray(json) && !hasUnclosedChar(json, char=',')) {
-    if (hasUnclosedChar(json, ',')) {                        # case pseudo array
+  if (isArray(json) && !hasUnclosedChar(json, peep=',')) {
+    if (hasUnclosedChar(json, peep=',')) {                           # pseudo array
       return(structure(paste0('[', json, ']'), class='json'))
-    } else if (!hasUnclosedChar(stripArray(json), ',')) {    # case atom array
+    } else if (!hasUnclosedChar(stripArray(json), peep=',')) {  # atom array
       return(structure(json, class='json'))
-    } else {                                                 # case real array
-      spl <- splitOnUnclosedChar(stripArray(json), ',')
+    } else {                                                    # real array
+      spl <- splitOnUnclosedChar(stripArray(json), peep=',')
       bxd <- sapply(as.list(spl), function(s) {
         if (isStruct(s) && hasUnboxedAtom(s)) boxAtoms(s) else s
       })
       glued <- paste0('[', paste0(bxd, collapse=','), ']')
       return(structure(glued, class='json'))
     }
-  } else if (isObject(json) && !hasUnclosedChar(json, char=',')) {
+  } else if (isObject(json) && !hasUnclosedChar(json, peep=',')) {
     # split on unclosed comma
-    cpl <- splitOnUnclosedChar(stripObject(json), ',', keep=TRUE)
+    cpl <- splitOnUnclosedChar(stripObject(json), peep=',', keep=TRUE)
     # split on unclosed colon
-    spl <- unlist(lapply(cpl, splitOnUnclosedChar, char=':', keep=TRUE))
+    spl <- unlist(lapply(cpl, splitOnUnclosedChar, peep=':', keep=TRUE))
     # peep through spl
     pre <- NA
     bxd <- lapply(spl, function(cur) {

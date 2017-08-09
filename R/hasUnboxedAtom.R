@@ -15,9 +15,9 @@ hasUnboxedAtom <- function(json, strict=TRUE) {
   if (isArray(json)) {
     return(FALSE)
   } else if (isObject(json)) {
-    cpl <- splitOnUnclosedChar(stripObject(json), ',')  # split on unclosed comma
+    cpl <- splitOnUnclosedChar(stripObject(json), peep=',')
     # split on unclosed colon
-    spl <- unlist(lapply(cpl, splitOnUnclosedChar, char=':', keep=TRUE))
+    spl <- unlist(lapply(cpl, splitOnUnclosedChar, peep=':', keep=TRUE))
     # peep through spl
     pre <- NA
     for (chunk in spl) {

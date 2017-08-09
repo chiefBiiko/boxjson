@@ -16,10 +16,10 @@ unboxAtoms <- function(json, strict=TRUE) {
     return(structure(stripArray(json), class='json'))
   } else if (isArray(json) &&
              any(grepl('^[\\[\\{].*[\\]\\}]$',  # ... has any boxed atoms?
-                       splitOnUnclosedChar(stripArray(json), ','),
+                       splitOnUnclosedChar(stripArray(json), peep=','),
                        perl=TRUE))) {
     # then unbox boxed atoms in array
-    spl <- splitOnUnclosedChar(stripArray(json), ',', keep=TRUE)
+    spl <- splitOnUnclosedChar(stripArray(json), peep=',', keep=TRUE)
     unboxd <- paste0('[',
                      paste0(gsub('^\\[(.*)\\]$', '\\1', spl, perl=TRUE),
                             collapse=''),
@@ -27,9 +27,9 @@ unboxAtoms <- function(json, strict=TRUE) {
     return(structure(unboxd, class='json'))
   } else if (isObject(json)) {
     # split on unclosed comma
-    cpl <- splitOnUnclosedChar(stripObject(json), ',', keep=TRUE)
+    cpl <- splitOnUnclosedChar(stripObject(json), peep=',', keep=TRUE)
     # split on unclosed colon
-    spl <- unlist(lapply(as.list(cpl), splitOnUnclosedChar, char=':', keep=TRUE))
+    spl <- unlist(lapply(as.list(cpl), splitOnUnclosedChar, peep=':', keep=TRUE))
     # peep through
     pre <- NA
     unbxd <- lapply(as.list(spl), function(cur) {
