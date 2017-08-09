@@ -16,12 +16,6 @@ hasUnboxedAtom <- function(json, strict=TRUE) {
   # checking
   if (isArray(json)) {
     return(FALSE)
-    # spl <- splitOnUnclosedChar(stripArray(json), ',')
-    # if (length(spl) > 1L) {
-    #   return(any(grepl('^[^\\[\\{].*[^\\]\\}]$', spl, perl=TRUE)))
-    # } else if (length(spl) == 1L) {
-    #   return(FALSE)
-    # }
   } else if (isObject(json)) {
     cpl <- splitOnUnclosedChar(stripObject(json), ',')  # split on unclosed comma
     # split on unclosed colon

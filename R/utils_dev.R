@@ -85,26 +85,6 @@ mutateInputJSON <- function(json) {
   return(json)  # serve
 }
 
-#' Does what its name says
-#'
-#' @param string character. Input string to \code{hasUnclosedChar}.
-#' @param index numeric. aka 'start searching after the character at index'.
-#' @return logical. See name.
-#'
-#' @keywords internal
-charIndexIsFollowedByUnevenNumberOfOuterDoubleQuotes <- function(string, index) {
-  stopifnot(isTruthyChr(string), is.numeric(index), index %% 1L == 0L)
-  trail <- strsplit(string, '')[[1L]]
-  countr <- 0L
-  for (i in (index + 1L):length(trail)) {
-    if (identical(trail[i], '"') &&
-        !grepl('^\\\\+$', trail[i - 1L], perl=TRUE)) {
-      countr <- countr + 1L
-    }
-  }
-  return(countr %% 2L != 0L)
-}
-
 #' Does a string contain a character neither enclosed in brackets nor
 #' double quotes?
 #'
@@ -120,36 +100,17 @@ hasUnclosedChar <- function(string, char) {
   chars <- strsplit(string, '')[[1L]]
   # setup
   opbr <- 0L     # if opbr is zero we r not in a struct
-##opqt <- FALSE  # if FALSE we r not in a string
   qtct <- 0L     # if even we r not in a string
   prev <- chars[1L]
   # peep through --- THIS VERSION IS COOL
   for (i in seq_along(chars)) {
     if (chars[i] %in% c('[', '{')) opbr <- opbr + 1L
     if (chars[i] %in% c(']', '}')) opbr <- opbr - 1L
-  ##if (chars[i] == '"' && chars[i - 1L] != '\\') qtct <- qtct + 1L
     if (chars[i] == '"' && prev != '\\') qtct <- qtct + 1L
-    # if no following closing bracket || opbr == 0 !!!
-    # !any(grepl("[]}]", chars[i:length(chars)]))
-    if (chars[i] == char &&
-        ((!any(grepl("[]}]", chars[i:length(chars)])) || opbr == 0L) &&
-         qtct %% 2L == 0L)) {
+    if (chars[i] == char && (opbr == 0L && qtct %% 2L == 0L)) {
       return(TRUE)
     }
-    # if (chars[i] == char && (opbr == 0L && qtct %% 2L == 0L)) {
-    #   return(TRUE)
-    # }
     prev <- chars[i]
-    # if (chars[i] == '"') {
-    #   if (charIndexIsFollowedByUnevenNumberOfOuterDoubleQuotes(string, i)) {
-    #     opqt <- TRUE
-    #   } else {
-    #     opqt <- FALSE
-    #   }
-    # }
-    # if (chars[i] == char && (opbr == 0L && !opqt)) {  # opqt %% 2L == 0L
-    #   return(TRUE)
-    # }
   }
   return(FALSE)
 }
@@ -170,7 +131,6 @@ splitOnUnclosedChar <- function(string, char, keep=FALSE) {
   chars <- strsplit(string, '', fixed=TRUE)[[1L]]
   # setup
   opbr <- 0L      # if opbr is zero we r not in a struct
-##opqt <- FALSE   # if FALSE we r not in a string
   qtct <- 0L      # if even we r not in a string
   last.cut <- 0L  # tracks last slice index
   accu <- vector('character')
@@ -179,11 +139,8 @@ splitOnUnclosedChar <- function(string, char, keep=FALSE) {
   for (i in seq_along(chars)) {
     if (chars[i] %in% c('[', '{')) opbr <- opbr + 1L
     if (chars[i] %in% c(']', '}')) opbr <- opbr - 1L
-##### if (chars[i] == '"' && chars[i - 1L] != '\\') qtct <- qtct + 1L
     if (chars[i] == '"' && prev != '\\') qtct <- qtct + 1L
-    if (chars[i] == char &&
-        ((!any(grepl("[]}]", chars[i:length(chars)])) || opbr == 0L) &&
-         qtct %% 2L == 0L)) {
+    if (chars[i] == char && (opbr == 0L && qtct %% 2L == 0L)) {
       if (!keep) {
         accu <- append(accu, substr(string, last.cut + 1L, i - 1L))
       } else {  # keep split character
@@ -195,25 +152,6 @@ splitOnUnclosedChar <- function(string, char, keep=FALSE) {
       }
       last.cut <- i
     }
-    # if (chars[i] == '"') {
-    #   if (charIndexIsFollowedByUnevenNumberOfOuterDoubleQuotes(string, i)) {
-    #     opqt <- TRUE
-    #   } else {
-    #     opqt <- FALSE
-    #   }
-    # }
-    # if (chars[i] == char && (opbr == 0L && !opqt)) {
-    #   if (!keep) {
-    #     accu <- append(accu, substr(string, last.cut + 1L, i - 1L))
-    #   } else {  # keep split character
-    #     # get pre
-    #     accu <- append(accu, substr(string, last.cut + 1L, i - 1L))
-    #     last.cut <- i - 1L
-    #     # get split character
-    #     accu <- append(accu, substr(string, last.cut + 1L, last.cut + 1L))
-    #   }
-    #   last.cut <- i
-    # }
     prev <- chars[i]
   }
   # consume remainder
