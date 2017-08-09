@@ -122,12 +122,24 @@ hasUnclosedChar <- function(string, char) {
   opbr <- 0L     # if opbr is zero we r not in a struct
 ##opqt <- FALSE  # if FALSE we r not in a string
   qtct <- 0L     # if even we r not in a string
+  prev <- chars[1L]
   # peep through --- THIS VERSION IS COOL
   for (i in seq_along(chars)) {
     if (chars[i] %in% c('[', '{')) opbr <- opbr + 1L
     if (chars[i] %in% c(']', '}')) opbr <- opbr - 1L
-    if (chars[i] == '"' && chars[i - 1L] != '\\') qtct <- qtct + 1L
-    if (chars[i] == char && (opbr == 0L && qtct %% 2L == 0L)) return(TRUE)
+  ##if (chars[i] == '"' && chars[i - 1L] != '\\') qtct <- qtct + 1L
+    if (chars[i] == '"' && prev != '\\') qtct <- qtct + 1L
+    # if no following closing bracket || opbr == 0 !!!
+    # !any(grepl("[]}]", chars[i:length(chars)]))
+    if (chars[i] == char &&
+        ((!any(grepl("[]}]", chars[i:length(chars)])) || opbr == 0L) &&
+         qtct %% 2L == 0L)) {
+      return(TRUE)
+    }
+    # if (chars[i] == char && (opbr == 0L && qtct %% 2L == 0L)) {
+    #   return(TRUE)
+    # }
+    prev <- chars[i]
     # if (chars[i] == '"') {
     #   if (charIndexIsFollowedByUnevenNumberOfOuterDoubleQuotes(string, i)) {
     #     opqt <- TRUE
@@ -158,35 +170,20 @@ splitOnUnclosedChar <- function(string, char, keep=FALSE) {
   chars <- strsplit(string, '', fixed=TRUE)[[1L]]
   # setup
   opbr <- 0L      # if opbr is zero we r not in a struct
-  opqt <- FALSE   # if FALSE we r not in a string
-##qtct <- 0L      # if even we r not in a string
+##opqt <- FALSE   # if FALSE we r not in a string
+  qtct <- 0L      # if even we r not in a string
   last.cut <- 0L  # tracks last slice index
   accu <- vector('character')
+  prev <- chars[1L]
   # peep through --- NEED 2 MAKE THIS ONE WORK LIKE THE OTHER !!!
   for (i in seq_along(chars)) {
     if (chars[i] %in% c('[', '{')) opbr <- opbr + 1L
     if (chars[i] %in% c(']', '}')) opbr <- opbr - 1L
-    # if (chars[i] == '"' && chars[i - 1L] != '\\') qtct <- qtct + 1L
-    # if (chars[i] == char && (opbr == 0L && qtct %% 2L == 0L)) {
-    #   if (!keep) {
-    #     accu <- append(accu, substr(string, last.cut + 1L, i - 1L))
-    #   } else {  # keep split character
-    #     # get pre
-    #     accu <- append(accu, substr(string, last.cut + 1L, i - 1L))
-    #     last.cut <- i - 1L
-    #     # get split character
-    #     accu <- append(accu, substr(string, last.cut + 1L, last.cut + 1L))
-    #   }
-    #   last.cut <- i
-    # }
-    if (chars[i] == '"') {
-      if (charIndexIsFollowedByUnevenNumberOfOuterDoubleQuotes(string, i)) {
-        opqt <- TRUE
-      } else {
-        opqt <- FALSE
-      }
-    }
-    if (chars[i] == char && (opbr == 0L && !opqt)) {
+##### if (chars[i] == '"' && chars[i - 1L] != '\\') qtct <- qtct + 1L
+    if (chars[i] == '"' && prev != '\\') qtct <- qtct + 1L
+    if (chars[i] == char &&
+        ((!any(grepl("[]}]", chars[i:length(chars)])) || opbr == 0L) &&
+         qtct %% 2L == 0L)) {
       if (!keep) {
         accu <- append(accu, substr(string, last.cut + 1L, i - 1L))
       } else {  # keep split character
@@ -198,6 +195,26 @@ splitOnUnclosedChar <- function(string, char, keep=FALSE) {
       }
       last.cut <- i
     }
+    # if (chars[i] == '"') {
+    #   if (charIndexIsFollowedByUnevenNumberOfOuterDoubleQuotes(string, i)) {
+    #     opqt <- TRUE
+    #   } else {
+    #     opqt <- FALSE
+    #   }
+    # }
+    # if (chars[i] == char && (opbr == 0L && !opqt)) {
+    #   if (!keep) {
+    #     accu <- append(accu, substr(string, last.cut + 1L, i - 1L))
+    #   } else {  # keep split character
+    #     # get pre
+    #     accu <- append(accu, substr(string, last.cut + 1L, i - 1L))
+    #     last.cut <- i - 1L
+    #     # get split character
+    #     accu <- append(accu, substr(string, last.cut + 1L, last.cut + 1L))
+    #   }
+    #   last.cut <- i
+    # }
+    prev <- chars[i]
   }
   # consume remainder
   if (last.cut < nchar(string))  {
