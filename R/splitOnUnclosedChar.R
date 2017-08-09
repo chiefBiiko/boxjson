@@ -1,9 +1,10 @@
 #' Splits a string on given character neither enclosed in brackets nor
 #' double quotes
 #'
-#' @param string Character vector of length 1L.
-#' @param character Single character to split on. Cannot be any of
+#' @param string character. Vector of length 1.
+#' @param peep character. Single character to split on. Cannot be any of
 #' \code{[]{}"}.
+#' @param keep logical. Keep \code{peep}?
 #' @return character. Vector of splits.
 #'
 #' @keywords internal

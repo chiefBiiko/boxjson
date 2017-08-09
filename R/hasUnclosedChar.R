@@ -1,8 +1,8 @@
 #' Does a string contain a character neither enclosed in brackets nor
 #' double quotes?
 #'
-#' @param string Character vector of length 1.
-#' @param character Single character to search for. Cannot be any of
+#' @param string character. Vector of length 1.
+#' @param peep character. Single character to search for. Cannot be any of
 #' \code{[]{}"}.
 #' @return Logical.
 #'
